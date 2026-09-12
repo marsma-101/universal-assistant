@@ -28,6 +28,10 @@
 
 本技能遵循「**自安装**」模型：你把仓库交给**自己的** agent，由该 agent 把自己装进去——不是由一个 agent 去扫描并改写其它 agent 软件的数据。跨软件写入人设是可选的独立工具（`tools/propagate.py`），默认不执行。
 
+> ⚠️ **安全安装须知（务必先读）**
+> **绝对不要把 GitHub 链接直接丢给 agent 并命令「装上」**。`install.py` 与 `tools/install-nvwa.py` 会执行文件复制和网络拉取，`tools/propagate.py` 甚至会跨软件写入人设数据（虽默认不执行）。未审查就让 agent 自动跑这些脚本，等于授予它在你电脑上任意写文件的权限。
+> **推荐安全流程**：① 先 `git clone` 到本地 → ② 人工审查 `SKILL.md` 与 `install.py` 内容 → ③ 手动 `python install.py --root <技能根>` → ④ 重启 agent 会话 → ⑤ 首次激活时核对 `scripts/check_install.py` 自检结果。若你的 agent 支持 `gh skill` 命令，可相对安全地用 `gh skill install marsma-101/universal-assistant universal-assistant`，它会自动处理目录规范——但装前审查仓库仍是必要习惯。
+
 ### 方式一：克隆（推荐，目录名自动正确）
 
 ```bash
@@ -54,6 +58,27 @@ python install.py --root ~/.claude             # 显式指定技能根
 ```
 
 安装器只做一件事：把本技能复制到 `<技能根>/universal-assistant` 并校验目录名与 frontmatter，随后提示你**重启 agent 会话**（DSH 有文件监听可即时生效）。它不碰任何其它软件的数据。
+
+### 方式四：一键脚本（install.sh / install.ps1）
+
+仓库根目录提供跨平台一键安装脚本，内部即「正确目录名克隆 + 运行安装器」：
+
+```bash
+# Windows（PowerShell，在仓库目录内）
+.\install.ps1 $env:USERPROFILE\.workbuddy\skills
+# 其它（bash / Git Bash）
+bash install.sh ~/.workbuddy/skills
+```
+
+环境变量推断失败时，脚本会打印各 agent 技能根示例并引导你手动指定。
+
+### 方式五：Download ZIP 后先做目录名校验（post-download-check.sh）
+
+若用了「Download ZIP」（解压得到带 `-main` 后缀的目录），**务必先跑校验脚本**再装——它能自动检测并把目录改名回 `universal-assistant`，否则规范型 agent 会静默跳过本技能：
+
+```bash
+bash post-download-check.sh        # 在解压出的目录内执行
+```
 
 ### 可选依赖：女娲（huashu-nvwa）
 
@@ -91,6 +116,9 @@ universal-assistant/
 ├── SKILL.md              # 技能本体（身份/边界/协议/层级关系）
 ├── config.json.example   # 配置模板（实际 config.json 不入库）
 ├── install.py            # 自安装器：复制到 <技能根>/universal-assistant 并校验
+├── install.sh            # 一键安装（bash）：正确目录名克隆 + 跑安装器
+├── install.ps1           # 一键安装（PowerShell）：Windows 原生同效
+├── post-download-check.sh # 下载/解压后校验目录名，自动修复 -main 陷阱
 ├── references/
 │   ├── examples.md       # 可验证使用示例（合同/选标的/用药+反例）
 │   └── non-use-cases.md  # 不适用场景清单

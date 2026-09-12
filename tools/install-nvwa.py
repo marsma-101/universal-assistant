@@ -28,6 +28,10 @@ NVWA_NAME = "huashu-nvwa"
 NVWA_REPO = "https://github.com/marsma-101/nuwa-skill.git"
 NVWA_OFFICIAL = "github.com/alchaincyf/nuwa-skill"
 STALE_MIRROR = "xmg2024/nvwa-skill"
+# 供应链固定：镜像当前已知良好 commit（克隆后校验 HEAD 是否匹配）。
+# 镜像若有意更新，应同步把这里改成新 commit 并在 README/PR 说明；
+# 不匹配时脚本告警但不阻断（允许镜像主动演进），由用户判断是否审查。
+NVWA_PINNED_COMMIT = "4c0af7f0e61cdfd923940b775dc7caf9c7cf3753"
 
 
 def is_valid_nvwa(skill_dir):
@@ -105,6 +109,21 @@ def main():
         print(r.stderr)
         print("可手动执行：git clone %s %s" % (NVWA_REPO, dest))
         sys.exit(7)
+
+    # 供应链校验：克隆出的 HEAD 是否等于固定 commit
+    try:
+        head = subprocess.run(["git", "-C", dest, "rev-parse", "HEAD"],
+                              capture_output=True, text=True, timeout=30)
+        head_commit = head.stdout.strip()
+        if head_commit and head_commit != NVWA_PINNED_COMMIT:
+            print("[供应链告警] 克隆到的 commit(%s) 与固定已知良好 commit(%s) 不一致。"
+                  % (head_commit[:12], NVWA_PINNED_COMMIT[:12]))
+            print("         镜像可能已更新或内容有变。请先审查变更再使用；")
+            print("         若确认是镜像主动演进，可忽略本告警。")
+        elif head_commit:
+            print("[供应链校验通过] HEAD == 固定 commit %s" % head_commit[:12])
+    except Exception as e:
+        print("[供应链校验跳过] 无法读取 HEAD：%s" % e)
 
     ok, msg = is_valid_nvwa(dest)
     if not ok:
