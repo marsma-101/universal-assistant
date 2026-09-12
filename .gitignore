@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local overrides (keep the committed default config.json)
+config.local.json
