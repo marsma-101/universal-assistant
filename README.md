@@ -7,10 +7,10 @@
 本技能把「私人助理 / 情报官 / 调度前端」三种角色合成一个可复用的身份：
 
 - **情报官**：收集信息、交叉验证、信源分级（`[一手]/[二手]/[推断]`）、存疑必标。
-- **参谋**：只把信息收拾干净摆在你面前，**绝不替你下结论**。
+- **参谋**：只把信息收拾干净摆在你面前，**绝不替你下结论**（非高风险可给「临时倾向+依据+反方最强论点」）。
 - **调度前端**：遇专业领域先建议你蒸馏一位专家当顾问，遇执行类任务转交执行智能体。
 
-> 它自己不下结论、不替你干活——只整理、汇总、给出「已知事实 / 关键不确定 / 各选项利弊 / 你需拍板的点」。
+> 它自己不下结论、不替你干活——只整理、汇总，给出「已知事实 / 关键不确定 / 各选项利弊 / 你需拍板的点」。
 
 ## 核心能力
 
@@ -22,22 +22,55 @@
 | 悬置判断 | 呈现事实，结论留给你 |
 | 办事妥帖 + 能读人 | 先确认再动手；看懂你没说的意图时给建议、由你决策，不擅自行动 |
 
-## 安装
+## 安装（自安装模型）
 
-1. 把本仓库克隆 / 下载到你的 AI agent 软件的技能目录，作为 `skills/universal-assistant/`（保持 `SKILL.md`、`config.json`、`scripts/` 结构）。**目录名必须与技能 `name`（`universal-assistant`）一致**，否则遵循 Agent Skills 规范的 agent 会静默跳过本技能。
-2. **必备依赖**：女娲（`huashu-nvwa`，原版 https://github.com/alchaincyf/nuwa-skill）须已安装——本助理在你需要专业领域时会调用它按需蒸馏专家。未安装会在首次激活时提示安装地址，不会擅自联网安装。
-3. 首次激活时，助理会：
-   - 请你给助理起个名字（写入 `config.json` 的 `agent_name`；出厂该字段为空，所以起名流程一定触发）；
-   - 检查女娲（`huashu-nvwa`）是否就绪；
-   - 运行 `scripts/detect_agents.py --json` 探测本机其它 AI agent 软件；
-   - **生成改动清单请你逐项确认**后，才按各软件格式把人设写入其智能体数据（写入前自动备份原文件）；
-   - 向你汇报起了什么名、写入了哪些软件。
+本技能遵循「**自安装**」模型：你把仓库交给**自己的** agent，由该 agent 把自己装进去——不是由一个 agent 去扫描并改写其它 agent 软件的数据。跨软件写入人设是可选的独立工具（`tools/propagate.py`），默认不执行。
 
-> 后续激活直接读 `config.json`，不再重复提问姓名。
+### 方式一：克隆（推荐，目录名自动正确）
+
+```bash
+git clone https://github.com/marsma-101/universal-assistant.git <技能根>/universal-assistant
+```
+
+> `<技能根>` 即你的 agent 的技能目录，例如 Claude Code 的 `~/.claude`、WorkBuddy 的 `~/.workbuddy/skills`、DSH 的技能根。
+
+### 方式二：Download ZIP（注意目录名！）
+
+GitHub 的「Download ZIP」解压后得到的是 `universal-assistant-main/`（多了 `-main` 后缀）。而 Agent Skills 规范**硬性要求目录名 == 技能 `name`（`universal-assistant`）**，带 `-main` 时规范型 agent 会**静默跳过**整个技能（不报错）。
+
+**解压后必须改名：** 
+
+```bash
+mv universal-assistant-main universal-assistant
+```
+
+### 方式三：用自带安装器（自动处理目录名校验）
+
+```bash
+python install.py --agent claude-code          # 读环境变量推断技能根
+python install.py --root ~/.claude             # 显式指定技能根
+```
+
+安装器只做一件事：把本技能复制到 `<技能根>/universal-assistant` 并校验目录名与 frontmatter，随后提示你**重启 agent 会话**（DSH 有文件监听可即时生效）。它不碰任何其它软件的数据。
+
+### 可选依赖：女娲（huashu-nvwa）
+
+蒸馏领域专家需要女娲，但它**不是运行本助理的前提**——未装时通用信息正常干活、专业领域降级为通用简报。
+
+```bash
+python tools/install-nvwa.py --root <技能根>   # 自动校验归属指向 alchaincyf，防装到旧镜像
+```
+
+或手动：`git clone https://github.com/alchaincyf/nuwa-skill.git <技能根>/huashu-nvwa`。
+唯一官方仓库：https://github.com/alchaincyf/nuwa-skill （作者：花叔，MIT）。
+
+### 首次激活时会发生什么
+
+助理会：① 请你起个名字（写入 config）；② 检查女娲（可选，缺失不阻断）；③ 运行 `scripts/check_install.py` 自检安装规范性；④ 向你汇报。后续激活直接读 config，不再重复提问。
 
 ## 改名 / 改称呼
 
-打开 `config.json`（出厂内容）：
+运行期配置优先级：`~/.universal-assistant/config.json` > `<技能目录>/config.json` > 默认值。仓库发的是 `config.json.example`（不跟踪实际 config，避免 git 弄脏）。
 
 ```json
 {
@@ -46,17 +79,24 @@
 }
 ```
 
-- `agent_name`：出厂为空。首次激活时助理会请你起名并写入；也可手动填好，助理将直接使用。
+- `agent_name`：首次激活时助理会请你起名并写入；也可手动填好直接生效。
 - `address_term`：助理对你的称呼，默认「用户」，可改成你习惯的叫法。
 
 ## 目录结构
 
 ```
 universal-assistant/
-├── SKILL.md            # 技能本体（身份/边界/协议/层级关系）
-├── config.json         # 名字与称呼配置（agent_name 出厂为空）
+├── SKILL.md              # 技能本体（身份/边界/协议/层级关系）
+├── config.json.example   # 配置模板（实际 config.json 不入库）
+├── install.py            # 自安装器：复制到 <技能根>/universal-assistant 并校验
+├── references/
+│   ├── examples.md       # 可验证使用示例（合同/选标的/用药+反例）
+│   └── non-use-cases.md  # 不适用场景清单
 ├── scripts/
-│   └── detect_agents.py # 探测本机 AI agent 软件及其人设写入格式（仅探测，不写入）
+│   └── check_install.py  # 自检：我在哪、装得对不对（核心，首次激活调用）
+├── tools/                # 可选、低频、高权限，默认不执行
+│   ├── install-nvwa.py   # 安装女娲（可选依赖），带原版归属校验
+│   └── propagate.py      # 跨软件写入人设（可选增强），须确认+备份+留痕
 ├── README.md
 ├── LICENSE
 └── .gitignore
@@ -77,11 +117,18 @@ universal-assistant/
    · 一类：按既定目标与框架动手干活（如执行智能体）
 ```
 
+## 兼容性
+
+需要联网检索工具（WebSearch / web_fetch 等）与子智能体能力；可选依赖 huashu-nvwa（未装时降级为通用简报）。
+- **已验证**：WorkBuddy / DSH / Claude Code
+- **未验证**：Codex / opencode / Hermes
+
 ## 隐私说明
 
-- `detect_agents.py` 仅探测你本机已安装的 AI agent 软件路径（用 `~` 与系统环境变量，不读取内容、不上传任何数据），供助理决定把人设写到哪里；脚本**只报告、不写入**，真正写入需你逐项确认并自动备份。
-- 本技能不含任何账号、密码或外部网络调用（除女娲蒸馏在你本地完成、信息不外发）。
-- 蒸馏专家需要女娲（`huashu-nvwa`）；安装地址见 SKILL.md「依赖：女娲」段。
+- 核心技能（SKILL.md）只做自查与多源信息收集，**不读取、不上传任何隐私数据**。
+- `scripts/check_install.py` 仅读取本技能自身目录，不扫描全机、不碰其它软件。
+- `tools/propagate.py` 是可选工具，默认不执行；执行时也必须先出清单、逐项确认、备份原文件、回读校验、留痕（可卸载还原）。
+- 本技能不含任何账号、密码或外部网络调用（女娲蒸馏在你本地完成、信息不外发）。
 
 ## 许可
 

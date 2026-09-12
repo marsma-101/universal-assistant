@@ -8,5 +8,12 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Local overrides (keep the committed default config.json)
-config.local.json
+# Runtime config（实际运行时的配置，避免在仓库里弄脏 git）
+# 仓库只发 config.json.example；运行期写入：
+#   - <技能目录>/config.json  （本地工作副本）
+#   - 或 ~/.universal-assistant/config.json （推荐，跨会话持久）
+config.json
+
+# propagate 工具产生的留痕与备份
+install-manifest.json
+*.bak.*
