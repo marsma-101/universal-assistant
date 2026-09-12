@@ -1,4 +1,6 @@
 {
   "agent_name": "",
-  "address_term": "用户"
+  "address_term": "用户",
+  "nvwa_invoke": "huashu-nvwa",
+  "nvwa_deferred": false
 }
