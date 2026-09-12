@@ -1,4 +1,4 @@
-# 最强助理（通用私人助理 · 情报官）技能
+# 通用私人助理 · 情报官（universal-assistant）技能
 
 一个**可重命名、可移植**的通用 AI 助理技能模板。任何人拿到后起个名字即可用，预设能力全部内置，无需从头调教。
 
@@ -24,29 +24,29 @@
 
 ## 安装
 
-1. 把本仓库克隆 / 下载到你的 AI agent 软件的技能目录，作为 `skills/universal-assistant/`（保持 `SKILL.md`、`config.json`、`scripts/` 结构）。
-2. **必备依赖**：`nvwa.skill`（女娲造人术）须已安装——本助理在你需要专业领域时会调用它按需蒸馏专家。未安装会在首次激活时提示。
+1. 把本仓库克隆 / 下载到你的 AI agent 软件的技能目录，作为 `skills/universal-assistant/`（保持 `SKILL.md`、`config.json`、`scripts/` 结构）。**目录名必须与技能 `name`（`universal-assistant`）一致**，否则遵循 Agent Skills 规范的 agent 会静默跳过本技能。
+2. **必备依赖**：女娲（`huashu-nvwa`，原版 https://github.com/alchaincyf/nuwa-skill）须已安装——本助理在你需要专业领域时会调用它按需蒸馏专家。未安装会在首次激活时提示安装地址，不会擅自联网安装。
 3. 首次激活时，助理会：
-   - 请你给助理起个名字（写入 `config.json` 的 `agent_name`）；
-   - 检查 `nvwa.skill` 是否就绪；
-   - 运行 `scripts/detect_agents.py` 探测本机其它 AI agent 软件；
-   - 按各软件格式把人设写入其智能体数据；
+   - 请你给助理起个名字（写入 `config.json` 的 `agent_name`；出厂该字段为空，所以起名流程一定触发）；
+   - 检查女娲（`huashu-nvwa`）是否就绪；
+   - 运行 `scripts/detect_agents.py --json` 探测本机其它 AI agent 软件；
+   - **生成改动清单请你逐项确认**后，才按各软件格式把人设写入其智能体数据（写入前自动备份原文件）；
    - 向你汇报起了什么名、写入了哪些软件。
 
 > 后续激活直接读 `config.json`，不再重复提问姓名。
 
-## 改名
+## 改名 / 改称呼
 
-打开 `config.json`：
+打开 `config.json`（出厂内容）：
 
 ```json
 {
-  "agent_name": "最强助理",
+  "agent_name": "",
   "address_term": "用户"
 }
 ```
 
-- `agent_name`：助理自称的名字（正文里以「本助理」指代，落盘后用此名）。
+- `agent_name`：出厂为空。首次激活时助理会请你起名并写入；也可手动填好，助理将直接使用。
 - `address_term`：助理对你的称呼，默认「用户」，可改成你习惯的叫法。
 
 ## 目录结构
@@ -54,9 +54,9 @@
 ```
 universal-assistant/
 ├── SKILL.md            # 技能本体（身份/边界/协议/层级关系）
-├── config.json         # 名字与称呼配置
+├── config.json         # 名字与称呼配置（agent_name 出厂为空）
 ├── scripts/
-│   └── detect_agents.py # 探测本机 AI agent 软件及其人设写入格式
+│   └── detect_agents.py # 探测本机 AI agent 软件及其人设写入格式（仅探测，不写入）
 ├── README.md
 ├── LICENSE
 └── .gitignore
@@ -69,7 +69,7 @@ universal-assistant/
    ↓
 助手智能体【本助理，名字由你起】
    · 查看问题，完善边界与目标
-   · 需专业建议时：调用已蒸馏的其它智能体，或调 nvwa.skill 蒸馏对应专家
+   · 需专业建议时：调用已蒸馏的其它智能体，或调女娲（huashu-nvwa）蒸馏对应专家
    · 制作 / 整理 / 汇总，不独立给终局方案，不独立动手解决复杂问题
    ↓
 其它智能体与技能（两类）
@@ -79,9 +79,9 @@ universal-assistant/
 
 ## 隐私说明
 
-- `detect_agents.py` 仅探测你本机已安装的 AI agent 软件路径（用 `~` 与系统环境变量，不读取内容、不上传任何数据），供助理决定把人设写到哪里。
-- 本技能不含任何账号、密码或外部网络调用。
-- 蒸馏专家需要 `nvwa.skill`；蒸馏过程在你本地完成，信息不外发。
+- `detect_agents.py` 仅探测你本机已安装的 AI agent 软件路径（用 `~` 与系统环境变量，不读取内容、不上传任何数据），供助理决定把人设写到哪里；脚本**只报告、不写入**，真正写入需你逐项确认并自动备份。
+- 本技能不含任何账号、密码或外部网络调用（除女娲蒸馏在你本地完成、信息不外发）。
+- 蒸馏专家需要女娲（`huashu-nvwa`）；安装地址见 SKILL.md「依赖：女娲」段。
 
 ## 许可
 
