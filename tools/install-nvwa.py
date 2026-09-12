@@ -10,7 +10,7 @@ install-nvwa.py — 安装女娲（huashu-nvwa）可选依赖（零依赖）。
 行为：
     1. 目标 = <技能根>/huashu-nvwa
     2. 若已存在且归属正确 → 跳过
-    3. 否则 git clone https://github.com/alchaincyf/nuwa-skill.git 到目标
+    3. 否则 git clone https://github.com/marsma-101/nuwa-skill.git 到目标（咱们的镜像，上游 alchaincyf/nuwa-skill）
     4. 校验：<目标>/SKILL.md frontmatter name == huashu-nvwa，且归属段指向 alchaincyf
     5. 失败（无 git / 无网）→ 给出可复制的手动命令，不静默失败
 
@@ -25,7 +25,7 @@ import subprocess
 import argparse
 
 NVWA_NAME = "huashu-nvwa"
-NVWA_REPO = "https://github.com/alchaincyf/nuwa-skill.git"
+NVWA_REPO = "https://github.com/marsma-101/nuwa-skill.git"
 NVWA_OFFICIAL = "github.com/alchaincyf/nuwa-skill"
 STALE_MIRROR = "xmg2024/nvwa-skill"
 

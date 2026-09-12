@@ -58,11 +58,11 @@ python install.py --root ~/.claude             # 显式指定技能根
 蒸馏领域专家需要女娲，但它**不是运行本助理的前提**——未装时通用信息正常干活、专业领域降级为通用简报。
 
 ```bash
-python tools/install-nvwa.py --root <技能根>   # 自动校验归属指向 alchaincyf，防装到旧镜像
+python tools/install-nvwa.py --root <技能根>   # 默认从咱们镜像 marsma-101/nuwa-skill 拉取，并校验归属指向 alchaincyf（上游），防装到旧镜像
 ```
 
-或手动：`git clone https://github.com/alchaincyf/nuwa-skill.git <技能根>/huashu-nvwa`。
-唯一官方仓库：https://github.com/alchaincyf/nuwa-skill （作者：花叔，MIT）。
+或手动：`git clone https://github.com/marsma-101/nuwa-skill.git <技能根>/huashu-nvwa`。
+上游官方仓库：https://github.com/alchaincyf/nuwa-skill （作者：花叔，MIT）；咱们镜像：https://github.com/marsma-101/nuwa-skill。
 
 ### 首次激活时会发生什么
 

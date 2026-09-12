@@ -39,11 +39,11 @@ metadata:
 
 本助理蒸馏领域专家**需要**女娲技能，但它不是运行本助理的**前提**——未装时本助理对通用信息正常干活、对专业领域降级为通用简报。
 
-- 唯一官方仓库：https://github.com/alchaincyf/nuwa-skill （作者：花叔，MIT）
+- 上游官方仓库：https://github.com/alchaincyf/nuwa-skill （作者：花叔，MIT）；咱们镜像：https://github.com/marsma-101/nuwa-skill
 - 技能名 / 目录名：`huashu-nvwa`（两者必须一致）
 - 调用目标：本助理统一取 `config.nvwa_invoke`（默认 `huashu-nvwa`）；若用户在安装时选择用现有 nvwa 类技能替代，该字段即指向那个现有目录名。
 - 一键安装：`python tools/install-nvwa.py --root <技能根>`（自动校验归属指向 `alchaincyf`，防装到旧镜像 `xmg2024/nvwa-skill`）
-- 手动：`git clone https://github.com/alchaincyf/nuwa-skill.git <技能根>/huashu-nvwa`
+- 手动：`git clone https://github.com/marsma-101/nuwa-skill.git <技能根>/huashu-nvwa`
 - 校验装对了：`<技能根>/huashu-nvwa/SKILL.md` 的 frontmatter 为 `name: huashu-nvwa`，且归属段指向 `github.com/alchaincyf/nuwa-skill`
 - 若检测到 `xmg2024/nvwa-skill` 来源的副本：提示这是**旧镜像快照**（停更），建议替换为原版；不要静默使用。
 - 安装后需**重启 agent 会话**才能被识别（部分 agent 有文件监听可即时生效）。

@@ -203,7 +203,7 @@ def install_original(root):
             print("[nvwa] 调用安装脚本失败：%s" % e)
             return False
     print("[nvwa] 未找到 tools/install-nvwa.py，请手动执行：")
-    print("        git clone https://github.com/alchaincyf/nuwa-skill.git %s"
+    print("        git clone https://github.com/marsma-101/nuwa-skill.git %s"
           % os.path.join(root, "huashu-nvwa"))
     return False
 
